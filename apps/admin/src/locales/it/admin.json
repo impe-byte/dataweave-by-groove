@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "DataWeave",
+    "company": "Groove",
+    "fullName": "DataWeave by Groove",
+    "adminPortal": "Admin Portal"
+  },
+  "sidebar": {
+    "navigation": "Navigazione",
+    "links": {
+      "dashboard": "Dashboard",
+      "tenants": "Gestione Tenant",
+      "documents": "Monitoraggio Documenti",
+      "systemLogs": "Log Sistema"
+    },
+    "footer": {
+      "version": "v0.2.0",
+      "environment": "Sviluppo"
+    }
+  },
+  "dashboard": {
+    "welcome": {
+      "title": "Panoramica Sistema",
+      "subtitle": "Monitoraggio globale di tutti i tenant e risorse"
+    },
+    "cards": {
+      "activeTenants": {
+        "label": "Tenant Attivi",
+        "description": "Aziende con sottoscrizione attiva"
+      },
+      "processedDocuments": {
+        "label": "Documenti Processati",
+        "description": "Totale documenti completati questo mese"
+      },
+      "systemErrors": {
+        "label": "Errori di Sistema",
+        "description": "Errori nelle ultime 24 ore"
+      }
+    },
+    "status": {
+      "operational": "Operativo",
+      "degraded": "Degradato",
+      "offline": "Offline"
+    }
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "noData": "Nessun dato disponibile",
+    "lastUpdated": "Ultimo aggiornamento"
+  }
+}
