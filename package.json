@@ -1,0 +1,43 @@
+{
+  "name": "dataweave-by-groove",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DataWeave by Groove - SaaS Document AI for DDT extraction and semantic mapping",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npx turbo run dev",
+    "build": "npx turbo run build",
+    "test": "npx turbo run test",
+    "lint": "npx turbo run lint",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:clean": "docker compose down -v",
+    "db:generate": "npx prisma generate --schema=packages/database/prisma/schema.prisma",
+    "db:migrate": "npm run docker:up && npx prisma migrate dev --name init --schema=packages/database/prisma/schema.prisma",
+    "db:studio": "npx prisma studio --schema=packages/database/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "prettier": "^3.4.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.3.0",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}

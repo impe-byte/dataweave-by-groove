@@ -1,0 +1,140 @@
+// DataWeave by Groove - Prisma Schema
+// Blueprint derivato dal System Architecture Dictionary
+// REGOLA: Multitenancy Ferrea - tutte le tabelle di dominio hanno tenant_id
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// TENANT & AUTH
+// ─────────────────────────────────────────────
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+model Tenant {
+  id                 String             @id @default(cuid())
+  name               String
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  aiTokenUsage       Int                @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  users           User[]
+  glossaryEntries GlossaryEntry[]
+  documents       Document[]
+
+  @@map("tenants")
+}
+
+enum UserRole {
+  GROOVE_ADMIN
+  TENANT_ADMIN
+  TENANT_USER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  role         UserRole @default(TENANT_USER)
+  email        String   @unique
+  passwordHash String
+  firstName    String?
+  lastName     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// GLOSSARY (Transcodifica Semantica)
+// ─────────────────────────────────────────────
+
+model GlossaryEntry {
+  id           String   @id @default(cuid())
+  tenantId     String
+  rawSource    String   // Valore originale estratto dal DDT
+  mappedTarget String   // Valore transcodificato target (XML)
+  category     String?  // Categoria opzionale per raggruppamento
+  lastUsedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, rawSource])
+  @@index([tenantId])
+  @@map("glossary_entries")
+}
+
+// ─────────────────────────────────────────────
+// DOCUMENTS & ROWS
+// ─────────────────────────────────────────────
+
+enum DocumentStatus {
+  UPLOADED
+  EXTRACTING
+  MAPPING
+  REVIEW_REQUIRED
+  COMPLETED
+  FAILED
+}
+
+model Document {
+  id            String         @id @default(cuid())
+  tenantId      String
+  status        DocumentStatus @default(UPLOADED)
+  fileName      String
+  fileUrl       String
+  fileSize      Int?
+  extractedJson Json?          // Raw JSON dall'estrazione AI
+  xmlOutput     String?        @db.Text // Output XML finale
+  errorMessage  String?
+  processedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  tenant Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rows   DocumentRow[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("documents")
+}
+
+model DocumentRow {
+  id              String  @id @default(cuid())
+  documentId      String
+  rowIndex        Int     // Ordine nella tabella DDT
+  rawText         String  // Testo originale estratto
+  mappedValue     String? // Valore dopo match col glossario
+  confidenceScore Float?  // Score 0-1 dal Matcher
+  isVerified      Boolean @default(false)
+  fieldName       String? // Nome del campo target XML
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("document_rows")
+}
