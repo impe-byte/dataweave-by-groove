@@ -43,6 +43,23 @@
       "offline": "Offline"
     }
   },
+  "tenants": {
+    "title": "Gestione Tenant",
+    "subtitle": "Amministrazione delle entità aziendali e dei relativi workspace",
+    "columns": {
+      "name": "Nome Tenant",
+      "status": "Stato",
+      "tokens": "Token Usati",
+      "createdAt": "Creato il"
+    },
+    "add": {
+      "button": "Aggiungi Tenant",
+      "placeholder": "Nome nuovo tenant...",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "success": "Tenant creato con successo!"
+    }
+  },
   "common": {
     "loading": "Caricamento...",
     "error": "Errore",
